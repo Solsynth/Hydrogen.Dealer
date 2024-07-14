@@ -43,15 +43,17 @@ func (v *HyperConn) RegisterService() error {
 	return err
 }
 
-func (v *HyperConn) KeepRegisterService() {
-	_ = v.RegisterService()
+func (v *HyperConn) KeepRegisterService() error {
+	err := v.RegisterService()
+	if err != nil {
+		return err
+	}
 
 	for {
 		time.Sleep(5 * time.Second)
 		client := health.NewHealthClient(v.dealerConn)
 		if _, err := client.Check(context.Background(), &health.HealthCheckRequest{}); err != nil {
-			v.KeepRegisterService()
-			return
+			return v.KeepRegisterService()
 		}
 	}
 }

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"git.solsynth.dev/hydrogen/dealer/pkg/internal/directory"
 	"git.solsynth.dev/hydrogen/dealer/pkg/proto"
+	"github.com/rs/zerolog/log"
 	"github.com/samber/lo"
 )
 
@@ -57,6 +58,7 @@ func (v *Server) AddService(ctx context.Context, info *proto.ServiceInfo) (*prot
 		HttpAddr: info.HttpAddr,
 	}
 	directory.AddServiceInstance(in)
+	log.Info().Str("id", info.GetId()).Str("label", info.GetLabel()).Msg("New service added.")
 	return &proto.AddServiceResponse{
 		IsSuccess: true,
 	}, nil
@@ -64,6 +66,7 @@ func (v *Server) AddService(ctx context.Context, info *proto.ServiceInfo) (*prot
 
 func (v *Server) RemoveService(ctx context.Context, request *proto.RemoveServiceRequest) (*proto.RemoveServiceResponse, error) {
 	directory.RemoveServiceInstance(request.GetId())
+	log.Info().Str("id", request.GetId()).Msg("A service removed.")
 	return &proto.RemoveServiceResponse{
 		IsSuccess: true,
 	}, nil
