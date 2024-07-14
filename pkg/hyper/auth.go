@@ -3,7 +3,6 @@ package hyper
 import (
 	"context"
 	"fmt"
-	"git.solsynth.dev/hydrogen/dealer/pkg/internal/directory"
 	"time"
 
 	"git.solsynth.dev/hydrogen/dealer/pkg/proto"
@@ -15,7 +14,7 @@ func (v *HyperConn) DoAuthenticate(atk, rtk string) (acc *proto.UserInfo, access
 	defer cancel()
 
 	var in *grpc.ClientConn
-	in, err = v.GetServiceGrpcConn(directory.ServiceTypeAuthProvider)
+	in, err = v.GetServiceGrpcConn(ServiceTypeAuthProvider)
 	if err != nil {
 		return
 	}
@@ -45,7 +44,7 @@ func (v *HyperConn) CheckPermGranted(atk string, key string, val []byte) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
 
-	in, err := v.GetServiceGrpcConn(directory.ServiceTypeAuthProvider)
+	in, err := v.GetServiceGrpcConn(ServiceTypeAuthProvider)
 	if err != nil {
 		return err
 	}

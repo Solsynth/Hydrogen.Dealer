@@ -3,15 +3,16 @@ package grpc
 import (
 	"context"
 	"fmt"
+	"git.solsynth.dev/hydrogen/dealer/pkg/hyper"
 	"git.solsynth.dev/hydrogen/dealer/pkg/internal/directory"
 	"git.solsynth.dev/hydrogen/dealer/pkg/proto"
 	"time"
 )
 
 func (v *Server) Authenticate(ctx context.Context, request *proto.AuthRequest) (*proto.AuthReply, error) {
-	instance := directory.GetServiceInstanceByType(directory.ServiceTypeAuthProvider)
+	instance := directory.GetServiceInstanceByType(hyper.ServiceTypeAuthProvider)
 	if instance == nil {
-		return &proto.AuthReply{}, fmt.Errorf("no available service %s found", directory.ServiceTypeAuthProvider)
+		return &proto.AuthReply{}, fmt.Errorf("no available service %s found", hyper.ServiceTypeAuthProvider)
 	}
 
 	conn, err := instance.GetGrpcConn()
@@ -27,9 +28,9 @@ func (v *Server) Authenticate(ctx context.Context, request *proto.AuthRequest) (
 }
 
 func (v *Server) EnsurePermGranted(ctx context.Context, request *proto.CheckPermRequest) (*proto.CheckPermReply, error) {
-	instance := directory.GetServiceInstanceByType(directory.ServiceTypeAuthProvider)
+	instance := directory.GetServiceInstanceByType(hyper.ServiceTypeAuthProvider)
 	if instance == nil {
-		return &proto.CheckPermReply{}, fmt.Errorf("no available service %s found", directory.ServiceTypeAuthProvider)
+		return &proto.CheckPermReply{}, fmt.Errorf("no available service %s found", hyper.ServiceTypeAuthProvider)
 	}
 
 	conn, err := instance.GetGrpcConn()

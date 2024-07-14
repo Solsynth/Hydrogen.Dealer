@@ -42,7 +42,7 @@ func DoAuthenticate(atk, rtk string) (acc *proto.UserInfo, accessTk string, refr
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
 
-	in := directory.GetServiceInstanceByType(directory.ServiceTypeAuthProvider)
+	in := directory.GetServiceInstanceByType(hyper.ServiceTypeAuthProvider)
 	if in == nil {
 		return
 	}
@@ -76,7 +76,7 @@ func CheckPermGranted(atk string, key string, val []byte) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
 
-	in := directory.GetServiceInstanceByType(directory.ServiceTypeAuthProvider)
+	in := directory.GetServiceInstanceByType(hyper.ServiceTypeAuthProvider)
 	if in == nil {
 		return fmt.Errorf("no auth provider found")
 	}

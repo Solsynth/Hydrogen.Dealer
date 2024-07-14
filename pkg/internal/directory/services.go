@@ -4,11 +4,6 @@ import (
 	"sync"
 )
 
-const (
-	ServiceTypeAuthProvider = "passport"
-	ServiceTypeFileProvider = "paperclip"
-)
-
 var serviceDirectory sync.Map
 
 func GetServiceInstance(id string) *ServiceInstance {
