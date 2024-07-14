@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+option go_package = ".;proto";
+
+package proto;
+
+service StreamController {
+  rpc PushStream(PushStreamRequest) returns (PushStreamResponse) {}
+}
+
+message PushStreamRequest {
+  uint64 user_id = 1;
+  bytes body = 2;
+}
+
+message PushStreamResponse {
+  bool is_all_success = 1;
+  int64 affected_count = 2;
+  int64 failed_count = 3;
+}

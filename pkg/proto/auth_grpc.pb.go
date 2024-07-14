@@ -20,7 +20,7 @@ const _ = grpc.SupportPackageIsVersion8
 
 const (
 	Auth_Authenticate_FullMethodName      = "/proto.Auth/Authenticate"
-	Auth_EnsurePermGranted_FullMethodName = "/proto.Auth/CheckPermGranted"
+	Auth_EnsurePermGranted_FullMethodName = "/proto.Auth/EnsurePermGranted"
 )
 
 // AuthClient is the client API for Auth service.
@@ -76,7 +76,7 @@ func (UnimplementedAuthServer) Authenticate(context.Context, *AuthRequest) (*Aut
 	return nil, status.Errorf(codes.Unimplemented, "method Authenticate not implemented")
 }
 func (UnimplementedAuthServer) EnsurePermGranted(context.Context, *CheckPermRequest) (*CheckPermReply, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CheckPermGranted not implemented")
+	return nil, status.Errorf(codes.Unimplemented, "method EnsurePermGranted not implemented")
 }
 func (UnimplementedAuthServer) mustEmbedUnimplementedAuthServer() {}
 
@@ -139,7 +139,7 @@ var Auth_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Auth_Authenticate_Handler,
 		},
 		{
-			MethodName: "CheckPermGranted",
+			MethodName: "EnsurePermGranted",
 			Handler:    _Auth_EnsurePermGranted_Handler,
 		},
 	},

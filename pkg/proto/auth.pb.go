@@ -504,9 +504,9 @@ var file_auth_proto_depIdxs = []int32{
 	0, // 0: proto.AuthInfo.info:type_name -> proto.UserInfo
 	1, // 1: proto.AuthReply.info:type_name -> proto.AuthInfo
 	2, // 2: proto.Auth.Authenticate:input_type -> proto.AuthRequest
-	4, // 3: proto.Auth.CheckPermGranted:input_type -> proto.CheckPermRequest
+	4, // 3: proto.Auth.EnsurePermGranted:input_type -> proto.CheckPermRequest
 	3, // 4: proto.Auth.Authenticate:output_type -> proto.AuthReply
-	5, // 5: proto.Auth.CheckPermGranted:output_type -> proto.CheckPermReply
+	5, // 5: proto.Auth.EnsurePermGranted:output_type -> proto.CheckPermReply
 	4, // [4:6] is the sub-list for method output_type
 	2, // [2:4] is the sub-list for method input_type
 	2, // [2:2] is the sub-list for extension type_name

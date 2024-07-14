@@ -14,6 +14,7 @@ import (
 
 type Server struct {
 	proto.UnimplementedServiceDirectoryServer
+	proto.UnimplementedStreamControllerServer
 	proto.UnimplementedAuthServer
 
 	srv *grpc.Server
@@ -24,9 +25,10 @@ func NewServer() *Server {
 		srv: grpc.NewServer(),
 	}
 
-	proto.RegisterServiceDirectoryServer(server.srv, &Server{})
-	proto.RegisterAuthServer(server.srv, &Server{})
-	health.RegisterHealthServer(server.srv, &Server{})
+	proto.RegisterServiceDirectoryServer(server.srv, server)
+	proto.RegisterStreamControllerServer(server.srv, server)
+	proto.RegisterAuthServer(server.srv, server)
+	health.RegisterHealthServer(server.srv, server)
 
 	reflection.Register(server.srv)
 
