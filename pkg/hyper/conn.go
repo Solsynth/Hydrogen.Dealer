@@ -62,6 +62,10 @@ func (v *HyperConn) KeepRegisterService() error {
 	return nil
 }
 
+func (v *HyperConn) GetDealerGrpcConn() *grpc.ClientConn {
+	return v.dealerConn
+}
+
 func (v *HyperConn) GetServiceGrpcConn(t string) (*grpc.ClientConn, error) {
 	if val, ok := v.cacheGrpcConn[t]; ok {
 		ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
