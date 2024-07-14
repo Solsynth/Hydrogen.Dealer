@@ -12,6 +12,8 @@ func MapAPIs(app *fiber.App) {
 		wellKnown.Get("/directory/services", listExistsService)
 	}
 
+	app.All("/srv/:service/*", forwardServiceRequest)
+
 	api := app.Group("/api").Name("API")
 	{
 		api.Use(func(c *fiber.Ctx) error {

@@ -53,9 +53,13 @@ func (v *HyperConn) KeepRegisterService() error {
 		time.Sleep(5 * time.Second)
 		client := health.NewHealthClient(v.dealerConn)
 		if _, err := client.Check(context.Background(), &health.HealthCheckRequest{}); err != nil {
-			return v.KeepRegisterService()
+			if v.KeepRegisterService() == nil {
+				break
+			}
 		}
 	}
+
+	return nil
 }
 
 func (v *HyperConn) GetServiceGrpcConn(t string) (*grpc.ClientConn, error) {
