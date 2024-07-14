@@ -5,7 +5,16 @@ option go_package = ".;proto";
 package proto;
 
 service StreamController {
+  rpc CountStreamConnection(CountConnectionRequest) returns (CountConnectionResponse) {}
   rpc PushStream(PushStreamRequest) returns (PushStreamResponse) {}
+}
+
+message CountConnectionRequest {
+  uint64 user_id = 1;
+}
+
+message CountConnectionResponse {
+  int64 count = 1;
 }
 
 message PushStreamRequest {

@@ -7,6 +7,13 @@ import (
 	"git.solsynth.dev/hydrogen/dealer/pkg/proto"
 )
 
+func (v *Server) CountStreamConnection(ctx context.Context, request *proto.CountConnectionRequest) (*proto.CountConnectionResponse, error) {
+	out := services.ClientCount(uint(request.GetUserId()))
+	return &proto.CountConnectionResponse{
+		Count: int64(out),
+	}, nil
+}
+
 func (v *Server) PushStream(ctx context.Context, request *proto.PushStreamRequest) (*proto.PushStreamResponse, error) {
 	cnt, success, errs := services.WebsocketPush(uint(request.GetUserId()), request.GetBody())
 	if len(errs) > 0 {

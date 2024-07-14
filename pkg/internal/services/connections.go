@@ -29,6 +29,10 @@ func ClientUnregister(user models.Account, conn *websocket.Conn) {
 	wsMutex.Unlock()
 }
 
+func ClientCount(uid uint) int {
+	return len(wsConn[uid])
+}
+
 func WebsocketPush(uid uint, body []byte) (count int, success int, errs []error) {
 	for conn := range wsConn[uid] {
 		if err := conn.WriteMessage(1, body); err != nil {

@@ -19,13 +19,15 @@ import (
 const _ = grpc.SupportPackageIsVersion8
 
 const (
-	StreamController_PushStream_FullMethodName = "/proto.StreamController/PushStream"
+	StreamController_CountStreamConnection_FullMethodName = "/proto.StreamController/CountStreamConnection"
+	StreamController_PushStream_FullMethodName            = "/proto.StreamController/PushStream"
 )
 
 // StreamControllerClient is the client API for StreamController service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type StreamControllerClient interface {
+	CountStreamConnection(ctx context.Context, in *CountConnectionRequest, opts ...grpc.CallOption) (*CountConnectionResponse, error)
 	PushStream(ctx context.Context, in *PushStreamRequest, opts ...grpc.CallOption) (*PushStreamResponse, error)
 }
 
@@ -35,6 +37,16 @@ type streamControllerClient struct {
 
 func NewStreamControllerClient(cc grpc.ClientConnInterface) StreamControllerClient {
 	return &streamControllerClient{cc}
+}
+
+func (c *streamControllerClient) CountStreamConnection(ctx context.Context, in *CountConnectionRequest, opts ...grpc.CallOption) (*CountConnectionResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CountConnectionResponse)
+	err := c.cc.Invoke(ctx, StreamController_CountStreamConnection_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *streamControllerClient) PushStream(ctx context.Context, in *PushStreamRequest, opts ...grpc.CallOption) (*PushStreamResponse, error) {
@@ -51,6 +63,7 @@ func (c *streamControllerClient) PushStream(ctx context.Context, in *PushStreamR
 // All implementations must embed UnimplementedStreamControllerServer
 // for forward compatibility
 type StreamControllerServer interface {
+	CountStreamConnection(context.Context, *CountConnectionRequest) (*CountConnectionResponse, error)
 	PushStream(context.Context, *PushStreamRequest) (*PushStreamResponse, error)
 	mustEmbedUnimplementedStreamControllerServer()
 }
@@ -59,6 +72,9 @@ type StreamControllerServer interface {
 type UnimplementedStreamControllerServer struct {
 }
 
+func (UnimplementedStreamControllerServer) CountStreamConnection(context.Context, *CountConnectionRequest) (*CountConnectionResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CountStreamConnection not implemented")
+}
 func (UnimplementedStreamControllerServer) PushStream(context.Context, *PushStreamRequest) (*PushStreamResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PushStream not implemented")
 }
@@ -73,6 +89,24 @@ type UnsafeStreamControllerServer interface {
 
 func RegisterStreamControllerServer(s grpc.ServiceRegistrar, srv StreamControllerServer) {
 	s.RegisterService(&StreamController_ServiceDesc, srv)
+}
+
+func _StreamController_CountStreamConnection_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CountConnectionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(StreamControllerServer).CountStreamConnection(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: StreamController_CountStreamConnection_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(StreamControllerServer).CountStreamConnection(ctx, req.(*CountConnectionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _StreamController_PushStream_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -100,6 +134,10 @@ var StreamController_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "proto.StreamController",
 	HandlerType: (*StreamControllerServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "CountStreamConnection",
+			Handler:    _StreamController_CountStreamConnection_Handler,
+		},
 		{
 			MethodName: "PushStream",
 			Handler:    _StreamController_PushStream_Handler,
