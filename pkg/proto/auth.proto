@@ -1,0 +1,48 @@
+syntax = "proto3";
+
+option go_package = ".;proto";
+
+package proto;
+
+service Auth {
+  rpc Authenticate(AuthRequest) returns (AuthReply) {}
+  rpc EnsurePermGranted(CheckPermRequest) returns (CheckPermReply) {}
+}
+
+message UserInfo {
+  uint64 id = 1;
+  string name = 2;
+  string nick = 3;
+  string email = 4;
+  string avatar = 5;
+  string banner = 6;
+  optional string description = 7;
+}
+
+message AuthInfo {
+  UserInfo info = 1;
+  bytes permissions = 2;
+  uint64 ticket_id = 3;
+  optional string new_access_token = 4;
+  optional string new_refresh_token = 5;
+}
+
+message AuthRequest {
+  string access_token = 1;
+  optional string refresh_token = 2;
+}
+
+message AuthReply {
+  bool is_valid = 1;
+  optional AuthInfo info = 2;
+}
+
+message CheckPermRequest {
+  string token = 1;
+  string key = 2;
+  bytes value = 3;
+}
+
+message CheckPermReply {
+  bool is_valid = 1;
+}
