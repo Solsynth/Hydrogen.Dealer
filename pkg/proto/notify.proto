@@ -18,6 +18,7 @@ message NotifyRequest {
   string title = 1;
   string subtitle = 2;
   string body = 3;
+  bytes metadata = 4;
 }
 
 message NotifyResponse {
