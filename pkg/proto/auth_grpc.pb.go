@@ -19,8 +19,9 @@ import (
 const _ = grpc.SupportPackageIsVersion8
 
 const (
-	Auth_Authenticate_FullMethodName      = "/proto.Auth/Authenticate"
-	Auth_EnsurePermGranted_FullMethodName = "/proto.Auth/EnsurePermGranted"
+	Auth_Authenticate_FullMethodName          = "/proto.Auth/Authenticate"
+	Auth_EnsurePermGranted_FullMethodName     = "/proto.Auth/EnsurePermGranted"
+	Auth_EnsureUserPermGranted_FullMethodName = "/proto.Auth/EnsureUserPermGranted"
 )
 
 // AuthClient is the client API for Auth service.
@@ -28,7 +29,8 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AuthClient interface {
 	Authenticate(ctx context.Context, in *AuthRequest, opts ...grpc.CallOption) (*AuthReply, error)
-	EnsurePermGranted(ctx context.Context, in *CheckPermRequest, opts ...grpc.CallOption) (*CheckPermReply, error)
+	EnsurePermGranted(ctx context.Context, in *CheckPermRequest, opts ...grpc.CallOption) (*CheckPermResponse, error)
+	EnsureUserPermGranted(ctx context.Context, in *CheckUserPermRequest, opts ...grpc.CallOption) (*CheckUserPermResponse, error)
 }
 
 type authClient struct {
@@ -49,10 +51,20 @@ func (c *authClient) Authenticate(ctx context.Context, in *AuthRequest, opts ...
 	return out, nil
 }
 
-func (c *authClient) EnsurePermGranted(ctx context.Context, in *CheckPermRequest, opts ...grpc.CallOption) (*CheckPermReply, error) {
+func (c *authClient) EnsurePermGranted(ctx context.Context, in *CheckPermRequest, opts ...grpc.CallOption) (*CheckPermResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(CheckPermReply)
+	out := new(CheckPermResponse)
 	err := c.cc.Invoke(ctx, Auth_EnsurePermGranted_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authClient) EnsureUserPermGranted(ctx context.Context, in *CheckUserPermRequest, opts ...grpc.CallOption) (*CheckUserPermResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CheckUserPermResponse)
+	err := c.cc.Invoke(ctx, Auth_EnsureUserPermGranted_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -64,7 +76,8 @@ func (c *authClient) EnsurePermGranted(ctx context.Context, in *CheckPermRequest
 // for forward compatibility
 type AuthServer interface {
 	Authenticate(context.Context, *AuthRequest) (*AuthReply, error)
-	EnsurePermGranted(context.Context, *CheckPermRequest) (*CheckPermReply, error)
+	EnsurePermGranted(context.Context, *CheckPermRequest) (*CheckPermResponse, error)
+	EnsureUserPermGranted(context.Context, *CheckUserPermRequest) (*CheckUserPermResponse, error)
 	mustEmbedUnimplementedAuthServer()
 }
 
@@ -75,8 +88,11 @@ type UnimplementedAuthServer struct {
 func (UnimplementedAuthServer) Authenticate(context.Context, *AuthRequest) (*AuthReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Authenticate not implemented")
 }
-func (UnimplementedAuthServer) EnsurePermGranted(context.Context, *CheckPermRequest) (*CheckPermReply, error) {
+func (UnimplementedAuthServer) EnsurePermGranted(context.Context, *CheckPermRequest) (*CheckPermResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method EnsurePermGranted not implemented")
+}
+func (UnimplementedAuthServer) EnsureUserPermGranted(context.Context, *CheckUserPermRequest) (*CheckUserPermResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method EnsureUserPermGranted not implemented")
 }
 func (UnimplementedAuthServer) mustEmbedUnimplementedAuthServer() {}
 
@@ -127,6 +143,24 @@ func _Auth_EnsurePermGranted_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Auth_EnsureUserPermGranted_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CheckUserPermRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServer).EnsureUserPermGranted(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Auth_EnsureUserPermGranted_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServer).EnsureUserPermGranted(ctx, req.(*CheckUserPermRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Auth_ServiceDesc is the grpc.ServiceDesc for Auth service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -141,6 +175,10 @@ var Auth_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "EnsurePermGranted",
 			Handler:    _Auth_EnsurePermGranted_Handler,
+		},
+		{
+			MethodName: "EnsureUserPermGranted",
+			Handler:    _Auth_EnsureUserPermGranted_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

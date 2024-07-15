@@ -6,7 +6,8 @@ package proto;
 
 service Auth {
   rpc Authenticate(AuthRequest) returns (AuthReply) {}
-  rpc EnsurePermGranted(CheckPermRequest) returns (CheckPermReply) {}
+  rpc EnsurePermGranted(CheckPermRequest) returns (CheckPermResponse) {}
+  rpc EnsureUserPermGranted(CheckUserPermRequest) returns (CheckUserPermResponse) {}
 }
 
 message UserInfo {
@@ -43,6 +44,17 @@ message CheckPermRequest {
   bytes value = 3;
 }
 
-message CheckPermReply {
+message CheckPermResponse {
+  bool is_valid = 1;
+}
+
+message CheckUserPermRequest {
+  uint64 user_id = 1;
+  uint64 other_id = 2;
+  string key = 3;
+  bytes value = 4;
+}
+
+message CheckUserPermResponse {
   bool is_valid = 1;
 }

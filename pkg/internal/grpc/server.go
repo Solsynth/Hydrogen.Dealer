@@ -1,8 +1,9 @@
 package grpc
 
 import (
-	"git.solsynth.dev/hydrogen/dealer/pkg/proto"
 	"net"
+
+	"git.solsynth.dev/hydrogen/dealer/pkg/proto"
 
 	"google.golang.org/grpc/reflection"
 
@@ -15,6 +16,7 @@ import (
 type Server struct {
 	proto.UnimplementedServiceDirectoryServer
 	proto.UnimplementedStreamControllerServer
+	proto.UnimplementedEventRecorderServer
 	proto.UnimplementedAuthServer
 
 	srv *grpc.Server
@@ -27,6 +29,7 @@ func NewServer() *Server {
 
 	proto.RegisterServiceDirectoryServer(server.srv, server)
 	proto.RegisterStreamControllerServer(server.srv, server)
+	proto.RegisterEventRecorderServer(server.srv, server)
 	proto.RegisterAuthServer(server.srv, server)
 	health.RegisterHealthServer(server.srv, server)
 
