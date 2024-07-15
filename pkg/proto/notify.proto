@@ -15,10 +15,11 @@ message NotifyUserRequest {
 }
 
 message NotifyRequest {
-  string title = 1;
-  string subtitle = 2;
-  string body = 3;
-  bytes metadata = 4;
+  string topic = 1;
+  string title = 2;
+  optional string subtitle = 3;
+  string body = 4;
+  bytes metadata = 5;
 }
 
 message NotifyResponse {
