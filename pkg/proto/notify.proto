@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+option go_package = ".;proto";
+
+package proto;
+
+service Notifier {
+  rpc NotifyUser(NotifyUserRequest) returns (NotifyResponse) {}
+  rpc NotifyAllUser(NotifyRequest) returns(NotifyResponse) {}
+}
+
+message NotifyUserRequest {
+  uint64 user_id = 1;
+  NotifyRequest notify = 2;
+}
+
+message NotifyRequest {
+  string title = 1;
+  string subtitle = 2;
+  string body = 3;
+}
+
+message NotifyResponse {
+  bool is_success = 1;
+  int64 affected_count = 2;
+}

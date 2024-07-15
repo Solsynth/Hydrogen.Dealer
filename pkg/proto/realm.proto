@@ -1,0 +1,69 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+
+option go_package = ".;proto";
+
+package proto;
+
+service Realm {
+  rpc ListCommunityRealm(ListRealmRequest) returns (ListRealmResponse) {}
+  rpc ListAvailableRealm(LookupUserRealmRequest) returns (ListRealmResponse) {}
+  rpc ListOwnedRealm(LookupUserRealmRequest) returns (ListRealmResponse) {}
+  rpc GetRealm(LookupRealmRequest) returns (RealmInfo) {}
+  rpc ListRealmMember(RealmMemberLookupRequest) returns (ListRealmMemberResponse) {}
+  rpc GetRealmMember(RealmMemberLookupRequest) returns (MemberInfo) {}
+  rpc CheckRealmMemberPerm(CheckRealmPermRequest) returns (CheckRealmPermResponse) {}
+}
+
+message RealmInfo {
+  uint64 id = 1;
+  string alias = 2;
+  string name = 3;
+  string description = 4;
+  bool is_public = 5;
+  bool is_community = 6;
+}
+
+message ListRealmRequest {
+}
+
+message LookupUserRealmRequest {
+  uint64 user_id = 1;
+}
+
+message LookupRealmRequest {
+  optional uint64 id = 1;
+  optional string alias = 2;
+  optional bool is_public = 3;
+  optional bool is_community = 4;
+}
+
+message ListRealmResponse {
+  repeated RealmInfo data = 1;
+}
+
+message RealmMemberLookupRequest {
+  uint64 realm_id = 1;
+  optional uint64 user_id = 2;
+}
+
+message MemberInfo {
+  uint64 realm_id = 1;
+  uint64 user_id = 2;
+  int32 power_level = 3;
+}
+
+message ListRealmMemberResponse {
+  repeated MemberInfo data = 1;
+}
+
+message CheckRealmPermRequest {
+  uint64 realm_id = 1;
+  uint64 user_id = 2;
+  int32 power_level = 3;
+}
+
+message CheckRealmPermResponse {
+  bool is_success = 1;
+}

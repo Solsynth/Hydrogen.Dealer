@@ -17,6 +17,8 @@ type Server struct {
 	proto.UnimplementedServiceDirectoryServer
 	proto.UnimplementedStreamControllerServer
 	proto.UnimplementedEventRecorderServer
+	proto.UnimplementedNotifierServer
+	proto.UnimplementedRealmServer
 	proto.UnimplementedAuthServer
 
 	srv *grpc.Server
@@ -30,6 +32,8 @@ func NewServer() *Server {
 	proto.RegisterServiceDirectoryServer(server.srv, server)
 	proto.RegisterStreamControllerServer(server.srv, server)
 	proto.RegisterEventRecorderServer(server.srv, server)
+	proto.RegisterNotifierServer(server.srv, server)
+	proto.RegisterRealmServer(server.srv, server)
 	proto.RegisterAuthServer(server.srv, server)
 	health.RegisterHealthServer(server.srv, server)
 
