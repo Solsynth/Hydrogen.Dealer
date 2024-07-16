@@ -53,6 +53,7 @@ func NewServer() *HTTPApp {
 	}))
 
 	app.Use(exts.AuthMiddleware)
+	app.Use(exts.LinkAccountMiddleware)
 
 	api.MapAPIs(app)
 

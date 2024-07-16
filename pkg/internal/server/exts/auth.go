@@ -8,6 +8,7 @@ import (
 
 	"git.solsynth.dev/hydrogen/dealer/pkg/hyper"
 	"git.solsynth.dev/hydrogen/dealer/pkg/internal/directory"
+	"git.solsynth.dev/hydrogen/dealer/pkg/internal/models"
 	"git.solsynth.dev/hydrogen/dealer/pkg/proto"
 	"github.com/gofiber/fiber/v2"
 	jsoniter "github.com/json-iterator/go"
@@ -116,4 +117,24 @@ func EnsureGrantedPerm(c *fiber.Ctx, key string, val any) error {
 		return fiber.NewError(fiber.StatusForbidden, err.Error())
 	}
 	return nil
+}
+
+func LinkAccountMiddleware(c *fiber.Ctx) error {
+	if val, ok := c.Locals("p_user").(*proto.UserInfo); ok {
+		account := models.Account{
+			BaseModel: models.BaseModel{
+				ID: uint(val.Id),
+			},
+			Name:         val.Name,
+			Nick:         val.Nick,
+			Avatar:       val.Avatar,
+			Banner:       val.Banner,
+			Description:  val.GetDescription(),
+			EmailAddress: val.GetEmail(),
+		}
+
+		c.Locals("user", account)
+	}
+
+	return c.Next()
 }
