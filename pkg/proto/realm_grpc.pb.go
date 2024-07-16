@@ -37,7 +37,7 @@ type RealmClient interface {
 	ListOwnedRealm(ctx context.Context, in *LookupUserRealmRequest, opts ...grpc.CallOption) (*ListRealmResponse, error)
 	GetRealm(ctx context.Context, in *LookupRealmRequest, opts ...grpc.CallOption) (*RealmInfo, error)
 	ListRealmMember(ctx context.Context, in *RealmMemberLookupRequest, opts ...grpc.CallOption) (*ListRealmMemberResponse, error)
-	GetRealmMember(ctx context.Context, in *RealmMemberLookupRequest, opts ...grpc.CallOption) (*MemberInfo, error)
+	GetRealmMember(ctx context.Context, in *RealmMemberLookupRequest, opts ...grpc.CallOption) (*RealmMemberInfo, error)
 	CheckRealmMemberPerm(ctx context.Context, in *CheckRealmPermRequest, opts ...grpc.CallOption) (*CheckRealmPermResponse, error)
 }
 
@@ -99,9 +99,9 @@ func (c *realmClient) ListRealmMember(ctx context.Context, in *RealmMemberLookup
 	return out, nil
 }
 
-func (c *realmClient) GetRealmMember(ctx context.Context, in *RealmMemberLookupRequest, opts ...grpc.CallOption) (*MemberInfo, error) {
+func (c *realmClient) GetRealmMember(ctx context.Context, in *RealmMemberLookupRequest, opts ...grpc.CallOption) (*RealmMemberInfo, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(MemberInfo)
+	out := new(RealmMemberInfo)
 	err := c.cc.Invoke(ctx, Realm_GetRealmMember_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -128,7 +128,7 @@ type RealmServer interface {
 	ListOwnedRealm(context.Context, *LookupUserRealmRequest) (*ListRealmResponse, error)
 	GetRealm(context.Context, *LookupRealmRequest) (*RealmInfo, error)
 	ListRealmMember(context.Context, *RealmMemberLookupRequest) (*ListRealmMemberResponse, error)
-	GetRealmMember(context.Context, *RealmMemberLookupRequest) (*MemberInfo, error)
+	GetRealmMember(context.Context, *RealmMemberLookupRequest) (*RealmMemberInfo, error)
 	CheckRealmMemberPerm(context.Context, *CheckRealmPermRequest) (*CheckRealmPermResponse, error)
 	mustEmbedUnimplementedRealmServer()
 }
@@ -152,7 +152,7 @@ func (UnimplementedRealmServer) GetRealm(context.Context, *LookupRealmRequest) (
 func (UnimplementedRealmServer) ListRealmMember(context.Context, *RealmMemberLookupRequest) (*ListRealmMemberResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListRealmMember not implemented")
 }
-func (UnimplementedRealmServer) GetRealmMember(context.Context, *RealmMemberLookupRequest) (*MemberInfo, error) {
+func (UnimplementedRealmServer) GetRealmMember(context.Context, *RealmMemberLookupRequest) (*RealmMemberInfo, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetRealmMember not implemented")
 }
 func (UnimplementedRealmServer) CheckRealmMemberPerm(context.Context, *CheckRealmPermRequest) (*CheckRealmPermResponse, error) {
