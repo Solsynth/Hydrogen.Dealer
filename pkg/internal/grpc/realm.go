@@ -57,10 +57,10 @@ func (v *Server) ListRealmMember(ctx context.Context, request *proto.RealmMember
 	)
 }
 
-func (v *Server) GetRealmMember(ctx context.Context, request *proto.RealmMemberLookupRequest) (*proto.MemberInfo, error) {
+func (v *Server) GetRealmMember(ctx context.Context, request *proto.RealmMemberLookupRequest) (*proto.RealmMemberInfo, error) {
 	return forwardInvokeRequest(
 		hyper.ServiceTypeAuthProvider,
-		func(ctx context.Context, conn *grpc.ClientConn) (*proto.MemberInfo, error) {
+		func(ctx context.Context, conn *grpc.ClientConn) (*proto.RealmMemberInfo, error) {
 			out, err := proto.NewRealmClient(conn).GetRealmMember(ctx, request)
 			return out, err
 		},
