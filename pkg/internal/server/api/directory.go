@@ -1,12 +1,13 @@
 package api
 
 import (
+	"strings"
+
 	"git.solsynth.dev/hydrogen/dealer/pkg/internal/directory"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/proxy"
 	"github.com/rs/zerolog/log"
 	"github.com/samber/lo"
-	"strings"
 )
 
 func listExistsService(c *fiber.Ctx) error {
@@ -32,7 +33,7 @@ func forwardServiceRequest(c *fiber.Ctx) error {
 
 	ogUrl := c.Request().URI().String()
 	url := c.OriginalURL()
-	url = strings.Replace(url, "/srv/"+serviceType, "", 1)
+	url = strings.Replace(url, "/srv/"+serviceType, "/api", 1)
 	url = "http://" + *service.HttpAddr + url
 
 	log.Debug().
