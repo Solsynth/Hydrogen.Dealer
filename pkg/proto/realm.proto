@@ -10,7 +10,7 @@ service Realm {
   rpc ListOwnedRealm(LookupUserRealmRequest) returns (ListRealmResponse) {}
   rpc GetRealm(LookupRealmRequest) returns (RealmInfo) {}
   rpc ListRealmMember(RealmMemberLookupRequest) returns (ListRealmMemberResponse) {}
-  rpc GetRealmMember(RealmMemberLookupRequest) returns (MemberInfo) {}
+  rpc GetRealmMember(RealmMemberLookupRequest) returns (RealmMemberInfo) {}
   rpc CheckRealmMemberPerm(CheckRealmPermRequest) returns (CheckRealmPermResponse) {}
 }
 
@@ -46,14 +46,14 @@ message RealmMemberLookupRequest {
   optional uint64 user_id = 2;
 }
 
-message MemberInfo {
+message RealmMemberInfo {
   uint64 realm_id = 1;
   uint64 user_id = 2;
   int32 power_level = 3;
 }
 
 message ListRealmMemberResponse {
-  repeated MemberInfo data = 1;
+  repeated RealmMemberInfo data = 1;
 }
 
 message CheckRealmPermRequest {
