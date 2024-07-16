@@ -3,13 +3,14 @@ package exts
 import (
 	"context"
 	"fmt"
+	"strings"
+	"time"
+
 	"git.solsynth.dev/hydrogen/dealer/pkg/hyper"
 	"git.solsynth.dev/hydrogen/dealer/pkg/internal/directory"
 	"git.solsynth.dev/hydrogen/dealer/pkg/proto"
 	"github.com/gofiber/fiber/v2"
 	jsoniter "github.com/json-iterator/go"
-	"strings"
-	"time"
 )
 
 func AuthMiddleware(c *fiber.Ctx) error {
@@ -32,7 +33,7 @@ func AuthMiddleware(c *fiber.Ctx) error {
 		if newAtk != atk {
 			SetAuthCookies(c, newAtk, newRtk)
 		}
-		c.Locals("user", acc)
+		c.Locals("p_user", acc)
 	}
 
 	return c.Next()
