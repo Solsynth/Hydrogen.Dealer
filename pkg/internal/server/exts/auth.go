@@ -123,12 +123,12 @@ func LinkAccountMiddleware(c *fiber.Ctx) error {
 	if val, ok := c.Locals("p_user").(*proto.UserInfo); ok {
 		account := models.Account{
 			BaseModel: models.BaseModel{
-				ID: uint(val.Id),
+				ID: uint(val.GetId()),
 			},
-			Name:         val.Name,
-			Nick:         val.Nick,
-			Avatar:       val.Avatar,
-			Banner:       val.Banner,
+			Name:         val.GetName(),
+			Nick:         val.GetNick(),
+			Avatar:       val.GetAvatar(),
+			Banner:       val.GetBanner(),
 			Description:  val.GetDescription(),
 			EmailAddress: val.GetEmail(),
 		}
