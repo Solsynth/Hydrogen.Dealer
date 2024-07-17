@@ -1,9 +1,10 @@
 package services
 
 import (
+	"sync"
+
 	"git.solsynth.dev/hydrogen/dealer/pkg/internal/models"
 	"github.com/gofiber/contrib/websocket"
-	"sync"
 )
 
 var (
@@ -41,6 +42,20 @@ func WebsocketPush(uid uint, body []byte) (count int, success int, errs []error)
 			success++
 		}
 		count++
+	}
+	return
+}
+
+func WebsocketPushBatch(uidList []uint, body []byte) (count int, success int, errs []error) {
+	for _, uid := range uidList {
+		for conn := range wsConn[uid] {
+			if err := conn.WriteMessage(1, body); err != nil {
+				errs = append(errs, err)
+			} else {
+				success++
+			}
+			count++
+		}
 	}
 	return
 }
