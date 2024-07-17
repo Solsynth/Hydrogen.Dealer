@@ -19,8 +19,9 @@ import (
 const _ = grpc.SupportPackageIsVersion8
 
 const (
-	Notifier_NotifyUser_FullMethodName    = "/proto.Notifier/NotifyUser"
-	Notifier_NotifyAllUser_FullMethodName = "/proto.Notifier/NotifyAllUser"
+	Notifier_NotifyUser_FullMethodName      = "/proto.Notifier/NotifyUser"
+	Notifier_NotifyUserBatch_FullMethodName = "/proto.Notifier/NotifyUserBatch"
+	Notifier_NotifyAllUser_FullMethodName   = "/proto.Notifier/NotifyAllUser"
 )
 
 // NotifierClient is the client API for Notifier service.
@@ -28,6 +29,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type NotifierClient interface {
 	NotifyUser(ctx context.Context, in *NotifyUserRequest, opts ...grpc.CallOption) (*NotifyResponse, error)
+	NotifyUserBatch(ctx context.Context, in *NotifyUserBatchRequest, opts ...grpc.CallOption) (*NotifyResponse, error)
 	NotifyAllUser(ctx context.Context, in *NotifyRequest, opts ...grpc.CallOption) (*NotifyResponse, error)
 }
 
@@ -49,6 +51,16 @@ func (c *notifierClient) NotifyUser(ctx context.Context, in *NotifyUserRequest, 
 	return out, nil
 }
 
+func (c *notifierClient) NotifyUserBatch(ctx context.Context, in *NotifyUserBatchRequest, opts ...grpc.CallOption) (*NotifyResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(NotifyResponse)
+	err := c.cc.Invoke(ctx, Notifier_NotifyUserBatch_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *notifierClient) NotifyAllUser(ctx context.Context, in *NotifyRequest, opts ...grpc.CallOption) (*NotifyResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(NotifyResponse)
@@ -64,6 +76,7 @@ func (c *notifierClient) NotifyAllUser(ctx context.Context, in *NotifyRequest, o
 // for forward compatibility
 type NotifierServer interface {
 	NotifyUser(context.Context, *NotifyUserRequest) (*NotifyResponse, error)
+	NotifyUserBatch(context.Context, *NotifyUserBatchRequest) (*NotifyResponse, error)
 	NotifyAllUser(context.Context, *NotifyRequest) (*NotifyResponse, error)
 	mustEmbedUnimplementedNotifierServer()
 }
@@ -74,6 +87,9 @@ type UnimplementedNotifierServer struct {
 
 func (UnimplementedNotifierServer) NotifyUser(context.Context, *NotifyUserRequest) (*NotifyResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method NotifyUser not implemented")
+}
+func (UnimplementedNotifierServer) NotifyUserBatch(context.Context, *NotifyUserBatchRequest) (*NotifyResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method NotifyUserBatch not implemented")
 }
 func (UnimplementedNotifierServer) NotifyAllUser(context.Context, *NotifyRequest) (*NotifyResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method NotifyAllUser not implemented")
@@ -109,6 +125,24 @@ func _Notifier_NotifyUser_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Notifier_NotifyUserBatch_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(NotifyUserBatchRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NotifierServer).NotifyUserBatch(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Notifier_NotifyUserBatch_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NotifierServer).NotifyUserBatch(ctx, req.(*NotifyUserBatchRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Notifier_NotifyAllUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(NotifyRequest)
 	if err := dec(in); err != nil {
@@ -137,6 +171,10 @@ var Notifier_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "NotifyUser",
 			Handler:    _Notifier_NotifyUser_Handler,
+		},
+		{
+			MethodName: "NotifyUserBatch",
+			Handler:    _Notifier_NotifyUserBatch_Handler,
 		},
 		{
 			MethodName: "NotifyAllUser",

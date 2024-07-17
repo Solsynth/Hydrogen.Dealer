@@ -6,11 +6,17 @@ package proto;
 
 service Notifier {
   rpc NotifyUser(NotifyUserRequest) returns (NotifyResponse) {}
+  rpc NotifyUserBatch(NotifyUserBatchRequest) returns (NotifyResponse) {}
   rpc NotifyAllUser(NotifyRequest) returns(NotifyResponse) {}
 }
 
 message NotifyUserRequest {
   uint64 user_id = 1;
+  NotifyRequest notify = 2;
+}
+
+message NotifyUserBatchRequest {
+  repeated uint64 user_id = 1;
   NotifyRequest notify = 2;
 }
 
