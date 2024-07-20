@@ -22,6 +22,7 @@ const (
 	StreamController_CountStreamConnection_FullMethodName = "/proto.StreamController/CountStreamConnection"
 	StreamController_PushStream_FullMethodName            = "/proto.StreamController/PushStream"
 	StreamController_PushStreamBatch_FullMethodName       = "/proto.StreamController/PushStreamBatch"
+	StreamController_EmitStreamEvent_FullMethodName       = "/proto.StreamController/EmitStreamEvent"
 )
 
 // StreamControllerClient is the client API for StreamController service.
@@ -31,6 +32,7 @@ type StreamControllerClient interface {
 	CountStreamConnection(ctx context.Context, in *CountConnectionRequest, opts ...grpc.CallOption) (*CountConnectionResponse, error)
 	PushStream(ctx context.Context, in *PushStreamRequest, opts ...grpc.CallOption) (*PushStreamResponse, error)
 	PushStreamBatch(ctx context.Context, in *PushStreamBatchRequest, opts ...grpc.CallOption) (*PushStreamResponse, error)
+	EmitStreamEvent(ctx context.Context, in *StreamEventRequest, opts ...grpc.CallOption) (*StreamEventResponse, error)
 }
 
 type streamControllerClient struct {
@@ -71,6 +73,16 @@ func (c *streamControllerClient) PushStreamBatch(ctx context.Context, in *PushSt
 	return out, nil
 }
 
+func (c *streamControllerClient) EmitStreamEvent(ctx context.Context, in *StreamEventRequest, opts ...grpc.CallOption) (*StreamEventResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(StreamEventResponse)
+	err := c.cc.Invoke(ctx, StreamController_EmitStreamEvent_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // StreamControllerServer is the server API for StreamController service.
 // All implementations must embed UnimplementedStreamControllerServer
 // for forward compatibility
@@ -78,6 +90,7 @@ type StreamControllerServer interface {
 	CountStreamConnection(context.Context, *CountConnectionRequest) (*CountConnectionResponse, error)
 	PushStream(context.Context, *PushStreamRequest) (*PushStreamResponse, error)
 	PushStreamBatch(context.Context, *PushStreamBatchRequest) (*PushStreamResponse, error)
+	EmitStreamEvent(context.Context, *StreamEventRequest) (*StreamEventResponse, error)
 	mustEmbedUnimplementedStreamControllerServer()
 }
 
@@ -93,6 +106,9 @@ func (UnimplementedStreamControllerServer) PushStream(context.Context, *PushStre
 }
 func (UnimplementedStreamControllerServer) PushStreamBatch(context.Context, *PushStreamBatchRequest) (*PushStreamResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PushStreamBatch not implemented")
+}
+func (UnimplementedStreamControllerServer) EmitStreamEvent(context.Context, *StreamEventRequest) (*StreamEventResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method EmitStreamEvent not implemented")
 }
 func (UnimplementedStreamControllerServer) mustEmbedUnimplementedStreamControllerServer() {}
 
@@ -161,6 +177,24 @@ func _StreamController_PushStreamBatch_Handler(srv interface{}, ctx context.Cont
 	return interceptor(ctx, in, info, handler)
 }
 
+func _StreamController_EmitStreamEvent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(StreamEventRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(StreamControllerServer).EmitStreamEvent(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: StreamController_EmitStreamEvent_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(StreamControllerServer).EmitStreamEvent(ctx, req.(*StreamEventRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // StreamController_ServiceDesc is the grpc.ServiceDesc for StreamController service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -179,6 +213,10 @@ var StreamController_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "PushStreamBatch",
 			Handler:    _StreamController_PushStreamBatch_Handler,
+		},
+		{
+			MethodName: "EmitStreamEvent",
+			Handler:    _StreamController_EmitStreamEvent_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
