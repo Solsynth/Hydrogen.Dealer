@@ -1,0 +1,45 @@
+syntax = "proto3";
+
+option go_package = ".;proto";
+
+import "notify.proto";
+
+package proto;
+
+service Postman {
+  rpc DeliverNotification(DeliverNotificationRequest) returns (DeliverResponse) {}
+  rpc DeliverNotificationBatch(DeliverNotificationBatchRequest) returns (DeliverResponse) {}
+  rpc DeliverEmail(DeliverEmailRequest) returns (DeliverResponse) {}
+  rpc DeliverEmailBatch(DeliverEmailBatchRequest) returns (DeliverResponse) {}
+}
+
+message DeliverNotificationRequest {
+  string provider = 1;
+  string device_token = 2;
+  NotifyRequest notify = 3;
+}
+
+message DeliverNotificationBatchRequest {
+  repeated string providers = 1;
+  repeated string device_tokens = 2;
+  NotifyRequest notify = 3;
+}
+
+message DeliverEmailRequest {
+  string to = 1;
+  EmailRequest email = 2;
+}
+
+message DeliverEmailBatchRequest {
+  repeated string to = 1;
+  EmailRequest email = 2;
+}
+
+message EmailRequest {
+  string subject = 1;
+  optional string text_body = 2;
+  optional string html_body = 3;
+}
+
+message DeliverResponse {
+}
