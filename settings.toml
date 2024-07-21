@@ -16,6 +16,9 @@ firebase_credentials = ""
 
 use_registration_magic_token = false
 
+[performance]
+notification_deliver.worker_count = 4
+
 [dealer]
 addr = "127.0.0.1:8442"
 
