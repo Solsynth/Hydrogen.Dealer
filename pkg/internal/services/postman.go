@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"git.solsynth.dev/hydrogen/dealer/pkg/proto"
 	"github.com/jordan-wright/email"
+	jsoniter "github.com/json-iterator/go"
 	"github.com/rs/zerolog/log"
 	"github.com/sideshow/apns2"
 	payload2 "github.com/sideshow/apns2/payload"
@@ -92,11 +93,15 @@ func PushAppleNotify(token string, in *proto.NotifyRequest) error {
 
 	start := time.Now()
 
+	var metadata map[string]any
+	_ = jsoniter.Unmarshal(in.GetMetadata(), &metadata)
+
 	data := payload2.
 		NewPayload().
 		AlertTitle(in.GetTitle()).
 		AlertBody(in.GetBody()).
 		Category(in.GetTopic()).
+		Custom("metadata", metadata).
 		Sound("default").
 		MutableContent()
 	if in.Avatar != nil {
