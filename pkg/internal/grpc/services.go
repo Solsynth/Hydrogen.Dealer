@@ -3,6 +3,7 @@ package grpc
 import (
 	"context"
 	"fmt"
+
 	"git.solsynth.dev/hydrogen/dealer/pkg/internal/directory"
 	"git.solsynth.dev/hydrogen/dealer/pkg/proto"
 	"github.com/rs/zerolog/log"
@@ -10,6 +11,9 @@ import (
 )
 
 func warpServiceInstanceToInfo(in *directory.ServiceInstance) *proto.ServiceInfo {
+	if in == nil {
+		return nil
+	}
 	return &proto.ServiceInfo{
 		Id:       in.ID,
 		Type:     in.Type,
