@@ -17,29 +17,20 @@ import (
 	"time"
 )
 
-var deliveryTaskQueue = make(chan any, 256)
-
-func PublishDeliveryTask(task any) {
-	deliveryTaskQueue <- task
-}
-
-func ConsumeDeliveryTasks() {
-	for {
-		task := <-deliveryTaskQueue
-		switch tk := task.(type) {
-		case *proto.DeliverEmailRequest:
-			if tk.GetEmail().HtmlBody != nil {
-				_ = SendMailHTML(tk.GetTo(), tk.GetEmail().GetSubject(), tk.GetEmail().GetHtmlBody())
-			} else {
-				_ = SendMail(tk.GetTo(), tk.GetEmail().GetSubject(), tk.GetEmail().GetTextBody())
-			}
-		case *proto.DeliverNotificationRequest:
-			switch tk.GetProvider() {
-			case "firebase":
-				_ = PushFirebaseNotify(tk.GetDeviceToken(), tk.GetNotify())
-			case "apple":
-				_ = PushAppleNotify(tk.GetDeviceToken(), tk.GetNotify())
-			}
+func DealDeliveryTask(task any) {
+	switch tk := task.(type) {
+	case *proto.DeliverEmailRequest:
+		if tk.GetEmail().HtmlBody != nil {
+			_ = SendMailHTML(tk.GetTo(), tk.GetEmail().GetSubject(), tk.GetEmail().GetHtmlBody())
+		} else {
+			_ = SendMail(tk.GetTo(), tk.GetEmail().GetSubject(), tk.GetEmail().GetTextBody())
+		}
+	case *proto.DeliverNotificationRequest:
+		switch tk.GetProvider() {
+		case "firebase":
+			_ = PushFirebaseNotify(tk.GetDeviceToken(), tk.GetNotify())
+		case "apple":
+			_ = PushAppleNotify(tk.GetDeviceToken(), tk.GetNotify())
 		}
 	}
 }

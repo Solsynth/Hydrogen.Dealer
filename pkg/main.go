@@ -41,11 +41,6 @@ func main() {
 		log.Warn().Err(err).Msg("An error occurred when setup APNs, apple notification push is unavailable...")
 	}
 
-	// Set up tasks queue consumers
-	for idx := 0; idx < max(1, viper.GetInt("performance.notification_deliver.worker_count")); idx++ {
-		go services.ConsumeDeliveryTasks()
-	}
-
 	// Server
 	go server.NewServer().Listen()
 
