@@ -33,7 +33,11 @@ func forwardServiceRequest(c *fiber.Ctx) error {
 
 	ogUrl := c.Request().URI().String()
 	url := c.OriginalURL()
+	prevUrl := url
 	url = strings.Replace(url, "/srv/"+serviceType, "/api", 1)
+	if prevUrl == url {
+		url = strings.Replace(url, "/cgi/"+serviceType, "/api", 1)
+	}
 	url = "http://" + *service.HttpAddr + url
 
 	log.Debug().

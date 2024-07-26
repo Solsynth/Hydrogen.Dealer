@@ -9,9 +9,13 @@ import (
 func MapAPIs(app *fiber.App) {
 	wellKnown := app.Group("/.well-known").Name("Well Known")
 	{
+		wellKnown.Get("/", func(c *fiber.Ctx) error {
+			return c.SendStatus(fiber.StatusOK)
+		})
 		wellKnown.Get("/directory/services", listExistsService)
 	}
 
+	app.All("/cgi/:service/*", forwardServiceRequest)
 	app.All("/srv/:service/*", forwardServiceRequest)
 
 	api := app.Group("/api").Name("API")
