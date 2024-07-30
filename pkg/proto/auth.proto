@@ -8,6 +8,8 @@ service Auth {
   rpc Authenticate(AuthRequest) returns (AuthReply) {}
   rpc EnsurePermGranted(CheckPermRequest) returns (CheckPermResponse) {}
   rpc EnsureUserPermGranted(CheckUserPermRequest) returns (CheckUserPermResponse) {}
+  rpc ListUserFriends(ListUserRelativeRequest) returns (ListUserRelativeResponse) {}
+  rpc ListUserBlocklist(ListUserRelativeRequest) returns (ListUserRelativeResponse) {}
 }
 
 message UserInfo {
@@ -57,4 +59,18 @@ message CheckUserPermRequest {
 
 message CheckUserPermResponse {
   bool is_valid = 1;
+}
+
+message SimpleUserInfo {
+    uint64 id = 1;
+    string name = 2;
+    string nick = 3;
+}
+
+message ListUserRelativeRequest {
+    uint64 user_id = 1;
+}
+
+message ListUserRelativeResponse {
+    repeated SimpleUserInfo data = 1;
 }
