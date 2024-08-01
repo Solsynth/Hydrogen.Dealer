@@ -69,6 +69,7 @@ message SimpleUserInfo {
 
 message ListUserRelativeRequest {
     uint64 user_id = 1;
+    bool is_related = 2;
 }
 
 message ListUserRelativeResponse {
