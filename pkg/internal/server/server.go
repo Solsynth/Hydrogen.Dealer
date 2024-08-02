@@ -27,6 +27,7 @@ func NewServer() *HTTPApp {
 		ProxyHeader:           fiber.HeaderXForwardedFor,
 		JSONEncoder:           jsoniter.ConfigCompatibleWithStandardLibrary.Marshal,
 		JSONDecoder:           jsoniter.ConfigCompatibleWithStandardLibrary.Unmarshal,
+		BodyLimit:             512 * 1024 * 1024 * 1024, // 512 TiB
 		EnablePrintRoutes:     viper.GetBool("debug.print_routes"),
 	})
 
