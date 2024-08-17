@@ -36,3 +36,6 @@ cookie_samesite = "Lax"
 access_token_duration = 300
 refresh_token_duration = 2592000
 
+[services]
+alias = { id = "auth", uc = "files", co = "interactive", im = "messagings" }
+

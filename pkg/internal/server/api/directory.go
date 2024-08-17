@@ -1,6 +1,7 @@
 package api
 
 import (
+	"github.com/spf13/viper"
 	"strings"
 
 	"git.solsynth.dev/hydrogen/dealer/pkg/internal/directory"
@@ -24,6 +25,11 @@ func listExistsService(c *fiber.Ctx) error {
 
 func forwardServiceRequest(c *fiber.Ctx) error {
 	serviceType := c.Params("service")
+
+	aliasingMap := viper.GetStringMapString("services.alias")
+	if val, ok := aliasingMap[serviceType]; ok {
+		serviceType = val
+	}
 
 	service := directory.GetServiceInstanceByType(serviceType)
 
