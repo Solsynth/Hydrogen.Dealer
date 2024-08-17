@@ -25,8 +25,9 @@ func listExistsService(c *fiber.Ctx) error {
 
 func forwardServiceRequest(c *fiber.Ctx) error {
 	serviceType := c.Params("service")
+	ogKeyword := serviceType
 
-	aliasingMap := viper.GetStringMapString("services.alias")
+	aliasingMap := viper.GetStringMapString("services.aliases")
 	if val, ok := aliasingMap[serviceType]; ok {
 		serviceType = val
 	}
@@ -39,11 +40,7 @@ func forwardServiceRequest(c *fiber.Ctx) error {
 
 	ogUrl := c.Request().URI().String()
 	url := c.OriginalURL()
-	prevUrl := url
-	url = strings.Replace(url, "/srv/"+serviceType, "/api", 1)
-	if prevUrl == url {
-		url = strings.Replace(url, "/cgi/"+serviceType, "/api", 1)
-	}
+	url = strings.Replace(url, "/cgi/"+ogKeyword, "/api", 1)
 	url = "http://" + *service.HttpAddr + url
 
 	log.Debug().

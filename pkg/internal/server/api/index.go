@@ -16,7 +16,6 @@ func MapAPIs(app *fiber.App) {
 	}
 
 	app.All("/cgi/:service/*", forwardServiceRequest)
-	app.All("/srv/:service/*", forwardServiceRequest)
 
 	api := app.Group("/api").Name("API")
 	{
