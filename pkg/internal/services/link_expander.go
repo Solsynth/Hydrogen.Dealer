@@ -1,6 +1,9 @@
 package services
 
 import (
+	"crypto/md5"
+	"encoding/hex"
+	"git.solsynth.dev/hydrogen/dealer/pkg/internal/database"
 	"git.solsynth.dev/hydrogen/dealer/pkg/internal/models"
 	"github.com/gocolly/colly"
 	"github.com/rs/zerolog/log"
@@ -10,7 +13,29 @@ import (
 	"time"
 )
 
+func RetrieveLinkMetaFromCache(target string) (models.LinkMeta, error) {
+	hash := md5.Sum([]byte(target))
+	entry := hex.EncodeToString(hash[:])
+	var meta models.LinkMeta
+	if err := database.C.Where("entry = ?", entry).First(&meta).Error; err != nil {
+		return meta, err
+	}
+	return meta, nil
+}
+
+func SaveLinkMetaToCache(target string, meta models.LinkMeta) error {
+	hash := md5.Sum([]byte(target))
+	entry := hex.EncodeToString(hash[:])
+	meta.Entry = entry
+	return database.C.Save(&meta).Error
+}
+
 func LinkExpand(target string) (*models.LinkMeta, error) {
+	if cache, err := RetrieveLinkMetaFromCache(target); err == nil {
+		log.Debug().Str("url", target).Msg("Expanding link... hit cache")
+		return &cache, nil
+	}
+
 	c := colly.NewCollector(
 		colly.UserAgent("SolarBot/1.0"),
 		colly.MaxDepth(3),
@@ -75,6 +100,7 @@ func LinkExpand(target string) (*models.LinkMeta, error) {
 	})
 
 	c.OnScraped(func(r *colly.Response) {
+		_ = SaveLinkMetaToCache(target, *meta)
 		log.Debug().Str("url", target).Msg("Expanding link... finished")
 	})
 

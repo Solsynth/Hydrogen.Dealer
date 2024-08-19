@@ -1,6 +1,7 @@
 package main
 
 import (
+	"git.solsynth.dev/hydrogen/dealer/pkg/internal/database"
 	"git.solsynth.dev/hydrogen/dealer/pkg/internal/services"
 	"os"
 	"os/signal"
@@ -31,6 +32,13 @@ func main() {
 	// Load settings
 	if err := viper.ReadInConfig(); err != nil {
 		log.Panic().Err(err).Msg("An error occurred when loading settings.")
+	}
+
+	// Connect to database
+	if err := database.NewSource(); err != nil {
+		log.Fatal().Err(err).Msg("An error occurred when connect to database.")
+	} else if err := database.RunMigration(database.C); err != nil {
+		log.Fatal().Err(err).Msg("An error occurred when running database auto migration.")
 	}
 
 	// Set up external services
