@@ -10,8 +10,8 @@ import (
 var inProgress sync.Map
 
 func getLinkMeta(c *fiber.Ctx) error {
-	targetEncoded := c.Params("target")
-	targetRaw, _ := base64.URLEncoding.DecodeString(targetEncoded)
+	targetEncoded := c.Params("*1")
+	targetRaw, _ := base64.StdEncoding.DecodeString(targetEncoded)
 
 	if ch, loaded := inProgress.LoadOrStore(targetEncoded, make(chan struct{})); loaded {
 		// If the request is already in progress, wait for it to complete

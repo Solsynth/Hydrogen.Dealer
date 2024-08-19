@@ -19,7 +19,7 @@ func MapAPIs(app *fiber.App) {
 
 	api := app.Group("/api").Name("API")
 	{
-		api.Get("/links/:target", getLinkMeta)
+		api.Get("/links/*", getLinkMeta)
 
 		api.Use(func(c *fiber.Ctx) error {
 			if err := exts.EnsureAuthenticated(c); err != nil {

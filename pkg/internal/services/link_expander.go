@@ -96,7 +96,7 @@ func LinkExpand(target string) (*models.LinkMeta, error) {
 		log.Debug().Str("url", target).Msg("Expanding link... analyzing")
 	})
 	c.OnError(func(r *colly.Response, err error) {
-		log.Warn().Err(err).Str("url", target).Str("resp", string(r.Body)).Msg("Expanding link... failed")
+		log.Warn().Err(err).Str("url", target).Msg("Expanding link... failed")
 	})
 
 	c.OnScraped(func(r *colly.Response) {
