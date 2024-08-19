@@ -44,4 +44,4 @@ prefix = "dealer_"
 aliases = { id = "auth", uc = "files", co = "interactive", im = "messaging" }
 
 [scraper]
-cache = "uploads/cache.db"
+user-agent = "SolarBot/1.0"

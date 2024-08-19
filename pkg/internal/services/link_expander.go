@@ -8,6 +8,7 @@ import (
 	"github.com/gocolly/colly"
 	"github.com/rs/zerolog/log"
 	"github.com/samber/lo"
+	"github.com/spf13/viper"
 	"net"
 	"net/http"
 	"time"
@@ -37,7 +38,7 @@ func LinkExpand(target string) (*models.LinkMeta, error) {
 	}
 
 	c := colly.NewCollector(
-		colly.UserAgent("SolarBot/1.0"),
+		colly.UserAgent(viper.GetString("scraper.user-agent")),
 		colly.MaxDepth(3),
 	)
 
