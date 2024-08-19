@@ -77,6 +77,12 @@ func LinkExpand(target string) (*models.LinkMeta, error) {
 			meta.Image = lo.ToPtr(e.Attr("content"))
 		case "og:video":
 			meta.Video = lo.ToPtr(e.Attr("content"))
+		case "og:audio":
+			meta.Audio = lo.ToPtr(e.Attr("content"))
+		case "og:site_name":
+			meta.SiteName = lo.ToPtr(e.Attr("content"))
+		case "og:type":
+			meta.Type = lo.ToPtr(e.Attr("content"))
 		}
 	})
 	c.OnHTML("link[rel]", func(e *colly.HTMLElement) {
