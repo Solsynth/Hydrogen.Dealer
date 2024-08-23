@@ -17,7 +17,17 @@ func (v *Server) CountStreamConnection(ctx context.Context, request *proto.Count
 }
 
 func (v *Server) PushStream(ctx context.Context, request *proto.PushStreamRequest) (*proto.PushStreamResponse, error) {
-	cnt, success, errs := services.WebsocketPush(uint(request.GetUserId()), request.GetBody())
+	var cnt int
+	var success int
+	var errs []error
+	if request.UserId != nil {
+		cnt, success, errs = services.WebsocketPush(uint(request.GetUserId()), request.GetBody())
+	} else if request.ClientId != nil {
+		cnt, success, errs = services.WebsocketPushDirect(request.GetClientId(), request.GetBody())
+	} else {
+		return nil, fmt.Errorf("you must give one of the user id or client id")
+	}
+
 	if len(errs) > 0 {
 		// Partial fail
 		return &proto.PushStreamResponse{
@@ -38,12 +48,24 @@ func (v *Server) PushStream(ctx context.Context, request *proto.PushStreamReques
 }
 
 func (v *Server) PushStreamBatch(ctx context.Context, request *proto.PushStreamBatchRequest) (*proto.PushStreamResponse, error) {
-	cnt, success, errs := services.WebsocketPushBatch(
-		lo.Map(request.GetUserId(), func(item uint64, idx int) uint {
-			return uint(item)
-		},
-		), request.GetBody(),
-	)
+	var cnt int
+	var success int
+	var errs []error
+	if len(request.UserId) != 0 {
+		cnt, success, errs = services.WebsocketPushBatch(
+			lo.Map(request.GetUserId(), func(item uint64, idx int) uint {
+				return uint(item)
+			},
+			), request.GetBody(),
+		)
+	}
+	if len(request.ClientId) != 0 {
+		cCnt, cSuccess, cErrs := services.WebsocketPushBatchDirect(request.GetClientId(), request.GetBody())
+		cnt += cCnt
+		success += cSuccess
+		errs = append(errs, cErrs...)
+	}
+
 	if len(errs) > 0 {
 		// Partial fail
 		return &proto.PushStreamResponse{

@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"math/rand"
 	"sync"
 
 	"git.solsynth.dev/hydrogen/dealer/pkg/hyper"
@@ -13,15 +14,16 @@ import (
 
 var (
 	wsMutex sync.Mutex
-	wsConn  = make(map[uint]map[*websocket.Conn]bool)
+	wsConn  = make(map[uint]map[uint64]*websocket.Conn)
 )
 
-func ClientRegister(user models.Account, conn *websocket.Conn) {
+func ClientRegister(user models.Account, conn *websocket.Conn) uint64 {
 	wsMutex.Lock()
 	if wsConn[user.ID] == nil {
-		wsConn[user.ID] = make(map[*websocket.Conn]bool)
+		wsConn[user.ID] = make(map[uint64]*websocket.Conn)
 	}
-	wsConn[user.ID][conn] = true
+	clientId := rand.Uint64()
+	wsConn[user.ID][clientId] = conn
 	wsMutex.Unlock()
 
 	pc, err := directory.GetServiceInstanceByType(hyper.ServiceTypeAuthProvider).GetGrpcConn()
@@ -31,14 +33,16 @@ func ClientRegister(user models.Account, conn *websocket.Conn) {
 			UserId: uint64(user.ID),
 		})
 	}
+
+	return clientId
 }
 
-func ClientUnregister(user models.Account, conn *websocket.Conn) {
+func ClientUnregister(user models.Account, id uint64) {
 	wsMutex.Lock()
 	if wsConn[user.ID] == nil {
-		wsConn[user.ID] = make(map[*websocket.Conn]bool)
+		wsConn[user.ID] = make(map[uint64]*websocket.Conn)
 	}
-	delete(wsConn[user.ID], conn)
+	delete(wsConn[user.ID], id)
 	wsMutex.Unlock()
 
 	pc, err := directory.GetServiceInstanceByType(hyper.ServiceTypeAuthProvider).GetGrpcConn()
@@ -55,7 +59,7 @@ func ClientCount(uid uint) int {
 }
 
 func WebsocketPush(uid uint, body []byte) (count int, success int, errs []error) {
-	for conn := range wsConn[uid] {
+	for _, conn := range wsConn[uid] {
 		if err := conn.WriteMessage(1, body); err != nil {
 			errs = append(errs, err)
 		} else {
@@ -66,15 +70,45 @@ func WebsocketPush(uid uint, body []byte) (count int, success int, errs []error)
 	return
 }
 
-func WebsocketPushBatch(uidList []uint, body []byte) (count int, success int, errs []error) {
-	for _, uid := range uidList {
-		for conn := range wsConn[uid] {
+func WebsocketPushDirect(clientId uint64, body []byte) (count int, success int, errs []error) {
+	for _, m := range wsConn {
+		if conn, ok := m[clientId]; ok {
 			if err := conn.WriteMessage(1, body); err != nil {
 				errs = append(errs, err)
 			} else {
 				success++
 			}
 			count++
+		}
+	}
+	return
+}
+
+func WebsocketPushBatch(uidList []uint, body []byte) (count int, success int, errs []error) {
+	for _, uid := range uidList {
+		for _, conn := range wsConn[uid] {
+			if err := conn.WriteMessage(1, body); err != nil {
+				errs = append(errs, err)
+			} else {
+				success++
+			}
+			count++
+		}
+	}
+	return
+}
+
+func WebsocketPushBatchDirect(clientIdList []uint64, body []byte) (count int, success int, errs []error) {
+	for _, clientId := range clientIdList {
+		for _, m := range wsConn {
+			if conn, ok := m[clientId]; ok {
+				if err := conn.WriteMessage(1, body); err != nil {
+					errs = append(errs, err)
+				} else {
+					success++
+				}
+				count++
+			}
 		}
 	}
 	return

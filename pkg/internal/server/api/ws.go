@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"fmt"
+
 	"git.solsynth.dev/hydrogen/dealer/pkg/hyper"
 	"git.solsynth.dev/hydrogen/dealer/pkg/internal/directory"
 	"git.solsynth.dev/hydrogen/dealer/pkg/internal/models"
@@ -18,8 +19,11 @@ func listenWebsocket(c *websocket.Conn) {
 	user := c.Locals("user").(models.Account)
 
 	// Push connection
-	services.ClientRegister(user, c)
-	log.Debug().Uint("user", user.ID).Msg("New websocket connection established...")
+	clientId := services.ClientRegister(user, c)
+	log.Debug().
+		Uint("user", user.ID).
+		Uint64("clientId", clientId).
+		Msg("New websocket connection established...")
 
 	// Event loop
 	var mt int
@@ -63,11 +67,11 @@ func listenWebsocket(c *websocket.Conn) {
 
 		sc := proto.NewStreamControllerClient(pc)
 		_, err = sc.EmitStreamEvent(context.Background(), &proto.StreamEventRequest{
-			Event:   packet.Action,
-			UserId:  uint64(user.ID),
-			Payload: packet.RawPayload(),
+			Event:    packet.Action,
+			UserId:   uint64(user.ID),
+			ClientId: uint64(clientId),
+			Payload:  packet.RawPayload(),
 		})
-
 		if err != nil {
 			_ = c.WriteMessage(mt, hyper.NetworkPackage{
 				Action:  "error",
@@ -78,6 +82,9 @@ func listenWebsocket(c *websocket.Conn) {
 	}
 
 	// Pop connection
-	services.ClientUnregister(user, c)
-	log.Debug().Uint("user", user.ID).Msg("A websocket connection disconnected...")
+	services.ClientUnregister(user, clientId)
+	log.Debug().
+		Uint("user", user.ID).
+		Uint64("clientId", clientId).
+		Msg("A websocket connection disconnected...")
 }

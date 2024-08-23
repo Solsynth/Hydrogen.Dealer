@@ -20,13 +20,15 @@ message CountConnectionResponse {
 }
 
 message PushStreamRequest {
-  uint64 user_id = 1;
-  bytes body = 2;
+  optional uint64 user_id = 1;
+  optional uint64 client_id = 2;
+  bytes body = 3;
 }
 
 message PushStreamBatchRequest {
   repeated uint64 user_id = 1;
-  bytes body = 2;
+  repeated uint64 client_id = 2;
+  bytes body = 3;
 }
 
 message PushStreamResponse {
@@ -38,7 +40,8 @@ message PushStreamResponse {
 message StreamEventRequest {
   string event = 1;
   uint64 user_id = 2;
-  bytes payload = 3;
+  uint64 client_id = 3;
+  bytes payload = 4;
 }
 
 message StreamEventResponse {
