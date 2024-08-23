@@ -5,7 +5,7 @@ import jsoniter "github.com/json-iterator/go"
 type NetworkPackage struct {
 	Action   string `json:"w"`
 	Endpoint string `json:"e,omitempty"`
-	Message  string `json:"m"`
+	Message  string `json:"m,omitempty"`
 	Payload  any    `json:"p"`
 }
 
