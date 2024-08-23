@@ -38,6 +38,7 @@ message PushStreamResponse {
 message StreamEventRequest {
   string event = 1;
   uint64 user_id = 2;
+  bytes payload = 3;
 }
 
 message StreamEventResponse {
