@@ -20,6 +20,8 @@ message UserInfo {
   string avatar = 5;
   string banner = 6;
   optional string description = 7;
+  optional uint64 affiliated_to = 8;
+  optional uint64 automated_by = 9;
 }
 
 message AuthInfo {
@@ -62,16 +64,18 @@ message CheckUserPermResponse {
 }
 
 message SimpleUserInfo {
-    uint64 id = 1;
-    string name = 2;
-    string nick = 3;
+  uint64 id = 1;
+  string name = 2;
+  string nick = 3;
+  optional uint64 affiliated_to = 8;
+  optional uint64 automated_by = 9;
 }
 
 message ListUserRelativeRequest {
-    uint64 user_id = 1;
-    bool is_related = 2;
+  uint64 user_id = 1;
+  bool is_related = 2;
 }
 
 message ListUserRelativeResponse {
-    repeated SimpleUserInfo data = 1;
+  repeated SimpleUserInfo data = 1;
 }
