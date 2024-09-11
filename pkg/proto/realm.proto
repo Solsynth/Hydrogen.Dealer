@@ -19,8 +19,10 @@ message RealmInfo {
   string alias = 2;
   string name = 3;
   string description = 4;
-  bool is_public = 5;
-  bool is_community = 6;
+  string avatar = 6;
+  string banner = 7;
+  bool is_public = 9;
+  bool is_community = 10;
 }
 
 message ListRealmRequest {
