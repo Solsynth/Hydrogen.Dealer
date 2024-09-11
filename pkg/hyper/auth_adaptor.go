@@ -51,6 +51,20 @@ func (v *HyperConn) AuthMiddleware(c *fiber.Ctx) error {
 	return c.Next()
 }
 
+func LinkAccountMiddleware[T any](model any, adaptor func(u BaseUser) T) func(c *fiber.Ctx) error {
+	return func(c *fiber.Ctx) error {
+		if val, ok := c.Locals("p_user").(*proto.UserInfo); ok {
+			if account, err := LinkAccount(model, val); err != nil {
+				return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+			} else {
+				c.Locals("user", adaptor(account))
+			}
+		}
+
+		return c.Next()
+	}
+}
+
 func (v *HyperConn) EnsureAuthenticated(c *fiber.Ctx) error {
 	if _, ok := c.Locals("p_user").(*proto.UserInfo); !ok {
 		return fiber.NewError(fiber.StatusUnauthorized)
