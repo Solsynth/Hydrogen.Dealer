@@ -1,17 +1,20 @@
 package hyper
 
 import (
-	"gorm.io/gorm"
 	"strings"
 	"time"
+
+	"gorm.io/gorm"
 
 	"git.solsynth.dev/hydrogen/dealer/pkg/proto"
 	"github.com/gofiber/fiber/v2"
 	jsoniter "github.com/json-iterator/go"
 )
 
-const CookieAtk = "__hydrogen_atk"
-const CookieRtk = "__hydrogen_rtk"
+const (
+	CookieAtk = "__hydrogen_atk"
+	CookieRtk = "__hydrogen_rtk"
+)
 
 func (v *HyperConn) AuthMiddleware(c *fiber.Ctx) error {
 	var atk string
@@ -52,10 +55,10 @@ func (v *HyperConn) AuthMiddleware(c *fiber.Ctx) error {
 	return c.Next()
 }
 
-func LinkAccountMiddleware[T any](tx *gorm.DB, model any, adaptor func(u BaseUser) T) func(c *fiber.Ctx) error {
+func LinkAccountMiddleware[T any](tx *gorm.DB, table string, adaptor func(u BaseUser) T) func(c *fiber.Ctx) error {
 	return func(c *fiber.Ctx) error {
 		if val, ok := c.Locals("p_user").(*proto.UserInfo); ok {
-			if account, err := LinkAccount(tx, model, val); err != nil {
+			if account, err := LinkAccount(tx, table, val); err != nil {
 				return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 			} else {
 				c.Locals("user", adaptor(account))

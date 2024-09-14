@@ -3,10 +3,11 @@ package hyper
 import (
 	"errors"
 	"fmt"
+	"reflect"
+
 	"git.solsynth.dev/hydrogen/dealer/pkg/proto"
 	"github.com/samber/lo"
 	"gorm.io/gorm"
-	"reflect"
 )
 
 type BaseUser struct {
@@ -24,12 +25,15 @@ type BaseUser struct {
 
 // LinkAccount will help you build a BaseUser model from proto.UserInfo
 // And also will help you to update the info in your database, so that this function requires a database context
-func LinkAccount(tx *gorm.DB, model any, userinfo *proto.UserInfo) (BaseUser, error) {
+func LinkAccount(tx *gorm.DB, table string, userinfo *proto.UserInfo) (BaseUser, error) {
 	var account BaseUser
 	if userinfo == nil {
 		return account, fmt.Errorf("remote userinfo was not found")
 	}
-	if err := tx.Where("id = ?", userinfo.GetId()).Model(model).First(&account).Error; err != nil {
+	if err := tx.
+		Where("id = ?", userinfo.GetId()).
+		Table(table).
+		First(&account).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			account = BaseUser{
 				BaseModel: BaseModel{
@@ -48,7 +52,7 @@ func LinkAccount(tx *gorm.DB, model any, userinfo *proto.UserInfo) (BaseUser, er
 			if userinfo.AutomatedBy != nil {
 				account.AutomatedBy = lo.ToPtr(uint(*userinfo.AutomatedBy))
 			}
-			return account, tx.Model(model).Save(&account).Error
+			return account, tx.Table(table).Save(&account).Error
 		}
 		return account, err
 	}
@@ -69,7 +73,7 @@ func LinkAccount(tx *gorm.DB, model any, userinfo *proto.UserInfo) (BaseUser, er
 
 	var err error
 	if !reflect.DeepEqual(prev, account) {
-		err = tx.Model(model).Save(&account).Error
+		err = tx.Table(table).Save(&account).Error
 	}
 
 	return account, err
