@@ -2,9 +2,10 @@ package grpc
 
 import (
 	"context"
+	"sync"
+
 	"git.solsynth.dev/hydrogen/dealer/pkg/internal/services"
 	"git.solsynth.dev/hydrogen/dealer/pkg/proto"
-	"sync"
 )
 
 func (v *Server) DeliverNotification(ctx context.Context, request *proto.DeliverNotificationRequest) (*proto.DeliverResponse, error) {
@@ -17,8 +18,8 @@ func (v *Server) DeliverNotificationBatch(ctx context.Context, request *proto.De
 	for idx, provider := range request.GetProviders() {
 		token := request.GetDeviceTokens()[idx]
 		provider := provider
+		wg.Add(1)
 		go func() {
-			wg.Add(1)
 			services.DealDeliveryTask(&proto.DeliverNotificationRequest{
 				Provider:    provider,
 				DeviceToken: token,
@@ -40,8 +41,8 @@ func (v *Server) DeliverEmailBatch(ctx context.Context, request *proto.DeliverEm
 	var wg sync.WaitGroup
 	for _, to := range request.GetTo() {
 		to := to
+		wg.Add(1)
 		go func() {
-			wg.Add(1)
 			services.DealDeliveryTask(&proto.DeliverEmailRequest{
 				To:    to,
 				Email: request.GetEmail(),
