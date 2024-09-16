@@ -1,8 +1,6 @@
 package server
 
 import (
-	"strings"
-
 	"git.solsynth.dev/hydrogen/dealer/pkg/internal/server/api"
 	"git.solsynth.dev/hydrogen/dealer/pkg/internal/server/exts"
 	"github.com/gofiber/fiber/v2"
@@ -34,15 +32,7 @@ func NewServer() *HTTPApp {
 	app.Use(idempotency.New())
 	app.Use(cors.New(cors.Config{
 		AllowCredentials: true,
-		AllowMethods: strings.Join([]string{
-			fiber.MethodGet,
-			fiber.MethodPost,
-			fiber.MethodHead,
-			fiber.MethodOptions,
-			fiber.MethodPut,
-			fiber.MethodDelete,
-			fiber.MethodPatch,
-		}, ","),
+		AllowMethods:     "GET,POST,HEAD,PUT,DELETE,PATCH",
 		AllowOriginsFunc: func(origin string) bool {
 			return true
 		},
