@@ -23,6 +23,7 @@ message RealmInfo {
   string banner = 7;
   bool is_public = 9;
   bool is_community = 10;
+  bytes access_policy = 11;
 }
 
 message ListRealmRequest {
@@ -44,7 +45,7 @@ message ListRealmResponse {
 }
 
 message RealmMemberLookupRequest {
-  uint64 realm_id = 1;
+  optional uint64 realm_id = 1;
   optional uint64 user_id = 2;
 }
 
