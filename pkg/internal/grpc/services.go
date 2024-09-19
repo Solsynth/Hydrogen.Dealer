@@ -3,6 +3,7 @@ package grpc
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"git.solsynth.dev/hydrogen/dealer/pkg/internal/directory"
 	"git.solsynth.dev/hydrogen/dealer/pkg/proto"
@@ -10,7 +11,7 @@ import (
 	"github.com/samber/lo"
 )
 
-func warpServiceInstanceToInfo(in *directory.ServiceInstance) *proto.ServiceInfo {
+func convertServiceToInfo(in *directory.ServiceInstance) *proto.ServiceInfo {
 	if in == nil {
 		return nil
 	}
@@ -27,13 +28,13 @@ func (v *Server) GetService(ctx context.Context, request *proto.GetServiceReques
 	if request.Id != nil {
 		out := directory.GetServiceInstance(request.GetId())
 		return &proto.GetServiceResponse{
-			Data: warpServiceInstanceToInfo(out),
+			Data: convertServiceToInfo(out),
 		}, nil
 	}
 	if request.Type != nil {
 		out := directory.GetServiceInstanceByType(request.GetType())
 		return &proto.GetServiceResponse{
-			Data: warpServiceInstanceToInfo(out),
+			Data: convertServiceToInfo(out),
 		}, nil
 	}
 	return nil, fmt.Errorf("no filter condition is provided")
@@ -48,7 +49,7 @@ func (v *Server) ListService(ctx context.Context, request *proto.ListServiceRequ
 	}
 	return &proto.ListServiceResponse{
 		Data: lo.Map(out, func(item *directory.ServiceInstance, index int) *proto.ServiceInfo {
-			return warpServiceInstanceToInfo(item)
+			return convertServiceToInfo(item)
 		}),
 	}, nil
 }
@@ -74,4 +75,18 @@ func (v *Server) RemoveService(ctx context.Context, request *proto.RemoveService
 	return &proto.RemoveServiceResponse{
 		IsSuccess: true,
 	}, nil
+}
+
+func (v *Server) BroadcastDeletion(ctx context.Context, request *proto.DeletionRequest) (*proto.DeletionResponse, error) {
+	for _, service := range directory.ListServiceInstance() {
+		conn, err := service.GetGrpcConn()
+		if err != nil {
+			continue
+		}
+		pc := proto.NewServiceDirectoryClient(conn)
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		_, err = pc.BroadcastDeletion(ctx, request)
+		cancel()
+	}
+	return &proto.DeletionResponse{}, nil
 }

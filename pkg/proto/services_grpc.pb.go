@@ -19,10 +19,11 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	ServiceDirectory_GetService_FullMethodName    = "/proto.ServiceDirectory/GetService"
-	ServiceDirectory_ListService_FullMethodName   = "/proto.ServiceDirectory/ListService"
-	ServiceDirectory_AddService_FullMethodName    = "/proto.ServiceDirectory/AddService"
-	ServiceDirectory_RemoveService_FullMethodName = "/proto.ServiceDirectory/RemoveService"
+	ServiceDirectory_GetService_FullMethodName        = "/proto.ServiceDirectory/GetService"
+	ServiceDirectory_ListService_FullMethodName       = "/proto.ServiceDirectory/ListService"
+	ServiceDirectory_AddService_FullMethodName        = "/proto.ServiceDirectory/AddService"
+	ServiceDirectory_RemoveService_FullMethodName     = "/proto.ServiceDirectory/RemoveService"
+	ServiceDirectory_BroadcastDeletion_FullMethodName = "/proto.ServiceDirectory/BroadcastDeletion"
 )
 
 // ServiceDirectoryClient is the client API for ServiceDirectory service.
@@ -33,6 +34,7 @@ type ServiceDirectoryClient interface {
 	ListService(ctx context.Context, in *ListServiceRequest, opts ...grpc.CallOption) (*ListServiceResponse, error)
 	AddService(ctx context.Context, in *ServiceInfo, opts ...grpc.CallOption) (*AddServiceResponse, error)
 	RemoveService(ctx context.Context, in *RemoveServiceRequest, opts ...grpc.CallOption) (*RemoveServiceResponse, error)
+	BroadcastDeletion(ctx context.Context, in *DeletionRequest, opts ...grpc.CallOption) (*DeletionResponse, error)
 }
 
 type serviceDirectoryClient struct {
@@ -83,6 +85,16 @@ func (c *serviceDirectoryClient) RemoveService(ctx context.Context, in *RemoveSe
 	return out, nil
 }
 
+func (c *serviceDirectoryClient) BroadcastDeletion(ctx context.Context, in *DeletionRequest, opts ...grpc.CallOption) (*DeletionResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DeletionResponse)
+	err := c.cc.Invoke(ctx, ServiceDirectory_BroadcastDeletion_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ServiceDirectoryServer is the server API for ServiceDirectory service.
 // All implementations must embed UnimplementedServiceDirectoryServer
 // for forward compatibility.
@@ -91,6 +103,7 @@ type ServiceDirectoryServer interface {
 	ListService(context.Context, *ListServiceRequest) (*ListServiceResponse, error)
 	AddService(context.Context, *ServiceInfo) (*AddServiceResponse, error)
 	RemoveService(context.Context, *RemoveServiceRequest) (*RemoveServiceResponse, error)
+	BroadcastDeletion(context.Context, *DeletionRequest) (*DeletionResponse, error)
 	mustEmbedUnimplementedServiceDirectoryServer()
 }
 
@@ -112,6 +125,9 @@ func (UnimplementedServiceDirectoryServer) AddService(context.Context, *ServiceI
 }
 func (UnimplementedServiceDirectoryServer) RemoveService(context.Context, *RemoveServiceRequest) (*RemoveServiceResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RemoveService not implemented")
+}
+func (UnimplementedServiceDirectoryServer) BroadcastDeletion(context.Context, *DeletionRequest) (*DeletionResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method BroadcastDeletion not implemented")
 }
 func (UnimplementedServiceDirectoryServer) mustEmbedUnimplementedServiceDirectoryServer() {}
 func (UnimplementedServiceDirectoryServer) testEmbeddedByValue()                          {}
@@ -206,6 +222,24 @@ func _ServiceDirectory_RemoveService_Handler(srv interface{}, ctx context.Contex
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ServiceDirectory_BroadcastDeletion_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeletionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ServiceDirectoryServer).BroadcastDeletion(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ServiceDirectory_BroadcastDeletion_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ServiceDirectoryServer).BroadcastDeletion(ctx, req.(*DeletionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ServiceDirectory_ServiceDesc is the grpc.ServiceDesc for ServiceDirectory service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -228,6 +262,10 @@ var ServiceDirectory_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "RemoveService",
 			Handler:    _ServiceDirectory_RemoveService_Handler,
+		},
+		{
+			MethodName: "BroadcastDeletion",
+			Handler:    _ServiceDirectory_BroadcastDeletion_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
