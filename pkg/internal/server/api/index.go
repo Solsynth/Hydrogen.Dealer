@@ -12,6 +12,7 @@ func MapAPIs(app *fiber.App) {
 		wellKnown.Get("/", func(c *fiber.Ctx) error {
 			return c.SendStatus(fiber.StatusOK)
 		})
+		wellKnown.Get("/check-ip", getClientIP)
 		wellKnown.Get("/directory/services", listExistsService)
 	}
 
