@@ -26,12 +26,15 @@ func ClientRegister(user models.Account, conn *websocket.Conn) uint64 {
 	wsConn[user.ID][clientId] = conn
 	wsMutex.Unlock()
 
-	pc, err := directory.GetServiceInstanceByType(hyper.ServiceTypeAuthProvider).GetGrpcConn()
-	if err == nil {
-		proto.NewStreamControllerClient(pc).EmitStreamEvent(context.Background(), &proto.StreamEventRequest{
-			Event:  "ClientRegister",
-			UserId: uint64(user.ID),
-		})
+	srv := directory.GetServiceInstanceByType(hyper.ServiceTypeAuthProvider)
+	if srv != nil {
+		pc, err := srv.GetGrpcConn()
+		if err == nil {
+			_, _ = proto.NewStreamControllerClient(pc).EmitStreamEvent(context.Background(), &proto.StreamEventRequest{
+				Event:  "ClientRegister",
+				UserId: uint64(user.ID),
+			})
+		}
 	}
 
 	return clientId
