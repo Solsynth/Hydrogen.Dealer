@@ -95,6 +95,9 @@ func PushAppleNotify(token string, in *proto.NotifyRequest) error {
 		Custom("metadata", metadata).
 		Sound("default").
 		MutableContent()
+	if in.Subtitle != nil {
+		data = data.AlertSubtitle(*in.Subtitle)
+	}
 	if in.Avatar != nil {
 		data = data.Custom("avatar", *in.Avatar)
 	}
@@ -118,7 +121,7 @@ func PushAppleNotify(token string, in *proto.NotifyRequest) error {
 			Dur("elapsed", time.Since(start)).
 			Str("reason", resp.Reason).
 			Int("status", resp.StatusCode).
-			Msg("Push a notify via firebase")
+			Msg("Push a notify via apple")
 	}
 
 	return nil
