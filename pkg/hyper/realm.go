@@ -6,7 +6,6 @@ import (
 	"reflect"
 
 	"git.solsynth.dev/hydrogen/dealer/pkg/proto"
-	jsoniter "github.com/json-iterator/go"
 	"gorm.io/datatypes"
 	"gorm.io/gorm"
 )
@@ -43,7 +42,7 @@ func LinkRealm(tx *gorm.DB, table string, info *proto.RealmInfo) (BaseRealm, err
 				Banner:       info.Banner,
 				IsPublic:     info.IsPublic,
 				IsCommunity:  info.IsCommunity,
-				AccessPolicy: DecodeAccessPolicy(info.AccessPolicy),
+				AccessPolicy: DecodeMap(info.AccessPolicy),
 			}
 
 			return realm, tx.Table(table).Save(&realm).Error
@@ -59,7 +58,7 @@ func LinkRealm(tx *gorm.DB, table string, info *proto.RealmInfo) (BaseRealm, err
 	realm.Banner = info.Banner
 	realm.IsPublic = info.IsPublic
 	realm.IsCommunity = info.IsCommunity
-	realm.AccessPolicy = DecodeAccessPolicy(info.AccessPolicy)
+	realm.AccessPolicy = DecodeMap(info.AccessPolicy)
 
 	var err error
 	if !reflect.DeepEqual(prev, realm) {
@@ -67,15 +66,4 @@ func LinkRealm(tx *gorm.DB, table string, info *proto.RealmInfo) (BaseRealm, err
 	}
 
 	return realm, err
-}
-
-func EncodeAccessPolicy(policy map[string]any) []byte {
-	raw, _ := jsoniter.Marshal(policy)
-	return raw
-}
-
-func DecodeAccessPolicy(raw []byte) map[string]any {
-	var policy map[string]any
-	_ = jsoniter.Unmarshal(raw, &policy)
-	return policy
 }
